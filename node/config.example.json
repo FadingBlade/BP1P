@@ -1,0 +1,20 @@
+{
+  "node": {
+    "id": "",
+    "name": "Example BP1P Node",
+    "region": "us-central",
+    "token": ""
+  },
+  "directoryUrl": "http://directory:8080",
+  "publicIp": "",
+  "udpPort": 8443,
+  "apps": [
+    {
+      "id": "demo",
+      "name": "BP1P Demo",
+      "description": "Example application served through BP1P",
+      "root": "/srv/bp1p/site",
+      "routes": []
+    }
+  ]
+}

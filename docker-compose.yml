@@ -1,0 +1,27 @@
+services:
+  directory:
+    build:
+      context: .
+      dockerfile: directory/Dockerfile
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  node:
+    build:
+      context: .
+      dockerfile: node/Dockerfile
+    depends_on:
+      - directory
+    ports:
+      - "8443:8443/udp"
+    volumes:
+      - ./node/config.example.json:/srv/bp1p/config.json:ro
+      - ./example-site:/srv/bp1p/site:ro
+      - bp1p-node-state:/srv/bp1p/state
+    environment:
+      BP1P_STATE: /srv/bp1p/state/node.json
+    restart: unless-stopped
+
+volumes:
+  bp1p-node-state:

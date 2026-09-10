@@ -1,0 +1,19 @@
+services:
+  node:
+    build:
+      context: ..
+      dockerfile: Host/node/Dockerfile
+    restart: unless-stopped
+    environment:
+      BP1P_DIRECTORY_URL: ${BP1P_DIRECTORY_URL}
+      BP1P_PUBLIC_URL: ${BP1P_NODE_PUBLIC_URL}
+      BP1P_NODE_NAME: ${BP1P_NODE_NAME:-Community BP1P Node}
+      BP1P_ADMIN_TOKEN: ${BP1P_NODE_ADMIN_TOKEN}
+      BP1P_ALLOW_PRIVATE_UPSTREAMS: ${BP1P_ALLOW_PRIVATE_UPSTREAMS:-false}
+    ports:
+      - "8081:8081"
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - bp1p-node-data:/data
+volumes:
+  bp1p-node-data:

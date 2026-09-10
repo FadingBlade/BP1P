@@ -1,0 +1,81 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BP1P</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;--bg:#070a10;--panel:#0e1420;--panel2:#111927;--line:#273247;--muted:#92a1b9;--accent:#6d8cff;--text:#f3f6ff;--ok:#56d894;--warn:#f2bd5c;--bad:#ff6b7a}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text)}body{overflow:hidden}.shell{height:100%;display:grid;grid-template-rows:64px 1fr}.bar{display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);background:#090d15f2;backdrop-filter:blur(16px);z-index:20}.brand{font-weight:900;font-size:22px;letter-spacing:-.04em}.badge{font-size:10px;padding:4px 7px;border:1px solid #3b4963;border-radius:999px;color:#b8c5da}.spacer{flex:1}.btn{border:1px solid #35435d;background:#141d2c;color:#fff;border-radius:10px;padding:9px 12px;font:inherit;font-weight:750;cursor:pointer}.btn:hover{border-color:#64779c}.btn.primary{background:var(--accent);border-color:#8aa1ff}.workspace{position:relative;min-height:0}.home{position:absolute;inset:0;overflow:auto;background:radial-gradient(circle at 18% -15%,#1b2948 0,var(--bg) 38%);padding:54px 22px 70px}.inner{width:min(1120px,100%);margin:auto}.hero h1{font-size:clamp(42px,7vw,78px);line-height:.95;letter-spacing:-.055em;margin:0}.hero p{max-width:720px;color:var(--muted);font-size:17px;line-height:1.55;margin:16px 0}.status{display:flex;gap:9px;align-items:center;margin:20px 0;color:#adbbcf}.dot{width:9px;height:9px;border-radius:99px;background:var(--warn)}.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:28px}.app{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:19px;min-height:160px;display:flex;flex-direction:column;cursor:pointer;transition:.15s transform,.15s border-color}.app:hover{transform:translateY(-2px);border-color:#566b8e}.app h3{margin:0 0 7px;font-size:18px}.app p{margin:0;color:var(--muted);line-height:1.45}.foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:18px}.node{font-size:12px;color:#9dafc9}.open{font-weight:800;color:#d0d9ff}.empty{border:1px dashed #35425c;border-radius:18px;padding:28px;color:var(--muted)}.browser{position:absolute;inset:0;display:none;grid-template-rows:52px 1fr;background:#05070b}.browser.active{display:grid}.browserbar{display:flex;gap:8px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--line);background:#0b1019}.browserbar .btn{padding:7px 10px}.address{flex:1;min-width:0;border:1px solid #303c54;background:#111823;border-radius:10px;color:#c7d1e2;padding:8px 11px;font:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.browser iframe{width:100%;height:100%;border:0;background:white}.modalback{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modalback.open{display:flex}.modal{width:min(620px,100%);background:#0e1521;border:1px solid #30405a;border-radius:20px;padding:22px;box-shadow:0 26px 90px #000a}.modal h2{margin:0 0 8px}.modal p{color:var(--muted);line-height:1.5}.field{display:grid;gap:7px;margin-top:15px}.field label{font-size:12px;color:#aebad0}.field input{width:100%;border:1px solid #33415b;background:#0a1019;color:#fff;border-radius:10px;padding:11px 12px;font:inherit}.actions{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}.small{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}@media(max-width:700px){.badge{display:none}.home{padding-top:36px}.bar{padding:0 9px}.btn span.long{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="bar">
+  <div class="brand">BP1P</div><span class="badge">PROXY</span>
+  <div class="spacer"></div>
+  <button class="btn" id="reloadNetwork">Reload</button>
+  <button class="btn" id="settingsBtn">Settings</button>
+  <button class="btn" id="defaultsBtn">Revert defaults</button>
+</header>
+<div class="workspace">
+  <section class="home" id="home">
+    <div class="inner">
+      <div class="hero"><h1>Open a site.</h1><p>This entire interface is running from the BP1P.html file on your computer. Choose an approved proxy application and BP1P will display it through a trusted backend node.</p></div>
+      <div class="status"><span class="dot" id="dot"></span><span id="status">Loading networkâ€¦</span></div>
+      <div class="grid" id="apps"></div>
+    </div>
+  </section>
+  <section class="browser" id="browser">
+    <div class="browserbar">
+      <button class="btn" id="closeBrowser">Home</button>
+      <button class="btn" id="refreshBrowser">Refresh</button>
+      <div class="address" id="browserAddress">BP1P</div>
+      <button class="btn" id="externalBrowser">Open tab</button>
+    </div>
+    <iframe id="frame" title="BP1P proxied site" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="no-referrer"></iframe>
+  </section>
+</div>
+</div>
+<div class="modalback" id="settingsModal">
+  <div class="modal">
+    <h2>BP1P settings</h2>
+    <p>Change the directory only when you want this client to use another BP1P network.</p>
+    <div class="field"><label for="directoryInput">Directory URL</label><input id="directoryInput" spellcheck="false"></div>
+    <div class="field"><label for="keyInput">Trusted directory public key (Base64 SPKI)</label><input id="keyInput" spellcheck="false"></div>
+    <div class="small">A paired public client should have a trusted key. Local development can learn the local directory key automatically.</div>
+    <div class="actions"><button class="btn" id="cancelSettings">Cancel</button><button class="btn primary" id="saveSettings">Save</button></div>
+  </div>
+</div>
+<script>
+'use strict';
+const BUILTIN_DIRECTORY='http://localhost:8080'.startsWith('__BP1P_')?'http://localhost:8080':'http://localhost:8080';
+const BUILTIN_KEY='MCowBQYDK2VwAyEAlMhs5WGkUX1fWkEiCPP+1BYEJEJ+yvNmWMhb16mEETQ='.startsWith('__BP1P_')?'':'MCowBQYDK2VwAyEAlMhs5WGkUX1fWkEiCPP+1BYEJEJ+yvNmWMhb16mEETQ=';
+const $=s=>document.querySelector(s);
+let manifest=null,currentApp=null,currentUrl='',trustedKey='';
+function safeGet(k){try{return localStorage.getItem(k)||''}catch{return ''}}
+function safeSet(k,v){try{localStorage.setItem(k,v)}catch{}}
+function safeRemove(k){try{localStorage.removeItem(k)}catch{}}
+function cleanUrl(v){return String(v||'').trim().replace(/\/$/,'')}
+function settings(){return{directory:cleanUrl(safeGet('bp1p.directory')||BUILTIN_DIRECTORY),key:(safeGet('bp1p.key')||BUILTIN_KEY).trim()}}
+function esc(s){return String(s).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function bytesB64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+function randomSession(){const b=new Uint8Array(18);crypto.getRandomValues(b);return Array.from(b,x=>x.toString(16).padStart(2,'0')).join('')}
+async function resolveKey(directory,key){if(key)return key;const r=await fetch(directory+'/api/public-key',{cache:'no-store',mode:'cors'});if(!r.ok)throw Error('Could not read directory public key (HTTP '+r.status+').');const j=await r.json();if(!j.publicKey)throw Error('Directory did not return a public key.');safeSet('bp1p.key',j.publicKey);return j.publicKey}
+async function verifySigned(obj,key){if(!crypto.subtle)throw Error('This browser does not provide WebCrypto on local files.');const k=await crypto.subtle.importKey('spki',bytesB64(key),{name:'Ed25519'},false,['verify']);const data=new TextEncoder().encode(JSON.stringify(obj.manifest));return crypto.subtle.verify({name:'Ed25519'},k,bytesB64(obj.signature),data)}
+async function load(){const cfg=settings();$('#dot').className='dot';$('#status').textContent='Verifying '+cfg.directory+'â€¦';$('#apps').innerHTML='';try{if(!/^https?:\/\//i.test(cfg.directory))throw Error('Directory URL must start with http:// or https://');trustedKey=await resolveKey(cfg.directory,cfg.key);const r=await fetch(cfg.directory+'/api/manifest',{cache:'no-store',mode:'cors'});if(!r.ok)throw Error('Directory returned HTTP '+r.status);const obj=await r.json();if(!(await verifySigned(obj,trustedKey)))throw Error('Directory signature verification failed.');if(new Date(obj.manifest.expiresAt)<new Date())throw Error('Signed directory manifest has expired.');manifest=obj.manifest;render();$('#dot').className='dot ok';$('#status').textContent=`Verified network Â· ${manifest.nodes.length} node${manifest.nodes.length===1?'':'s'}`;}catch(e){manifest=null;$('#dot').className='dot bad';$('#status').textContent=e.message||String(e);$('#apps').innerHTML='<div class="empty">BP1P could not establish a trusted network connection. Make sure the host is running, then click Reload. You can also check Settings.</div>';}}
+function appMap(){const byApp=new Map();if(!manifest)return byApp;for(const n of manifest.nodes||[]){for(const a of n.apps||[]){if(!byApp.has(a.id))byApp.set(a.id,{app:a,nodes:[]});byApp.get(a.id).nodes.push(n)}}return byApp}
+function render(){const items=[...appMap().values()].sort((a,b)=>String(a.app.name).localeCompare(String(b.app.name)));$('#apps').innerHTML=items.length?items.map(({app,nodes})=>`<article class="app" data-app="${esc(app.id)}"><h3>${esc(app.name)}</h3><p>${esc(app.description||'Proxy application')}</p><div class="foot"><span class="node">${nodes.length} available node${nodes.length===1?'':'s'}</span><span class="open">Open â†’</span></div></article>`).join(''):'<div class="empty">No approved proxy applications are online.</div>';for(const el of document.querySelectorAll('.app'))el.addEventListener('click',()=>openApp(el.dataset.app))}
+function openApp(id){const options=(manifest?.nodes||[]).filter(n=>(n.apps||[]).some(a=>a.id===id));if(!options.length)return;options.sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));const n=options[0];const sid=randomSession();const url=n.url.replace(/\/$/,'')+'/s/'+sid+'/p/'+encodeURIComponent(id)+'/';currentApp=id;currentUrl=url;$('#browserAddress').textContent='bp1p://'+id+' Â· '+n.name;$('#frame').src=url;$('#home').style.display='none';$('#browser').classList.add('active')}
+function closeBrowser(){const f=$('#frame');f.src='about:blank';currentApp=null;currentUrl='';$('#browser').classList.remove('active');$('#home').style.display='block'}
+function refreshBrowser(){if(!currentUrl)return;const f=$('#frame');f.src='about:blank';setTimeout(()=>{f.src=currentUrl},30)}
+function openExternal(){if(currentUrl)window.open(currentUrl,'_blank','noopener,noreferrer')}
+function openSettings(){$('#directoryInput').value=settings().directory;$('#keyInput').value=settings().key;$('#settingsModal').classList.add('open')}
+function closeSettings(){$('#settingsModal').classList.remove('open')}
+function saveSettings(){const d=cleanUrl($('#directoryInput').value);const k=$('#keyInput').value.trim();if(!/^https?:\/\//i.test(d)){alert('Directory URL must start with http:// or https://');return}safeSet('bp1p.directory',d);if(k)safeSet('bp1p.key',k);else safeRemove('bp1p.key');closeSettings();load()}
+function revertDefaults(){safeRemove('bp1p.directory');safeRemove('bp1p.key');trustedKey='';closeBrowser();load()}
+$('#reloadNetwork').addEventListener('click',load);$('#settingsBtn').addEventListener('click',openSettings);$('#defaultsBtn').addEventListener('click',revertDefaults);$('#cancelSettings').addEventListener('click',closeSettings);$('#saveSettings').addEventListener('click',saveSettings);$('#closeBrowser').addEventListener('click',closeBrowser);$('#refreshBrowser').addEventListener('click',refreshBrowser);$('#externalBrowser').addEventListener('click',openExternal);$('#settingsModal').addEventListener('click',e=>{if(e.target===$('#settingsModal'))closeSettings()});
+load();setInterval(()=>{if(!currentApp)load()},60000);
+</script>
+</body>
+</html>
+

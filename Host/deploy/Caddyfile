@@ -1,0 +1,9 @@
+{$BP1P_DIRECTORY_HOST} {
+  encode zstd gzip
+  reverse_proxy directory:8080
+}
+
+{$BP1P_NODE_HOST} {
+  encode zstd gzip
+  reverse_proxy node:8081
+}

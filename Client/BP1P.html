@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -21,7 +21,7 @@
   <section class="home" id="home">
     <div class="inner">
       <div class="hero"><h1>Open a site.</h1><p>This entire interface is running from the BP1P.html file on your computer. Choose an approved proxy application and BP1P will display it through a trusted backend node.</p></div>
-      <div class="status"><span class="dot" id="dot"></span><span id="status">Loading networkâ€¦</span></div>
+      <div class="status"><span class="dot" id="dot"></span><span id="status">Loading network…</span></div>
       <div class="grid" id="apps"></div>
     </div>
   </section>
@@ -48,8 +48,8 @@
 </div>
 <script>
 'use strict';
-const BUILTIN_DIRECTORY='http://localhost:8080'.startsWith('__BP1P_')?'http://localhost:8080':'http://localhost:8080';
-const BUILTIN_KEY='MCowBQYDK2VwAyEAlMhs5WGkUX1fWkEiCPP+1BYEJEJ+yvNmWMhb16mEETQ='.startsWith('__BP1P_')?'':'MCowBQYDK2VwAyEAlMhs5WGkUX1fWkEiCPP+1BYEJEJ+yvNmWMhb16mEETQ=';
+const BUILTIN_DIRECTORY='__BP1P_DIRECTORY_URL__'.startsWith('__BP1P_')?'http://localhost:8080':'__BP1P_DIRECTORY_URL__';
+const BUILTIN_KEY='__BP1P_DIRECTORY_KEY__'.startsWith('__BP1P_')?'':'__BP1P_DIRECTORY_KEY__';
 const $=s=>document.querySelector(s);
 let manifest=null,currentApp=null,currentUrl='',trustedKey='';
 function safeGet(k){try{return localStorage.getItem(k)||''}catch{return ''}}
@@ -62,10 +62,10 @@ function bytesB64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
 function randomSession(){const b=new Uint8Array(18);crypto.getRandomValues(b);return Array.from(b,x=>x.toString(16).padStart(2,'0')).join('')}
 async function resolveKey(directory,key){if(key)return key;const r=await fetch(directory+'/api/public-key',{cache:'no-store',mode:'cors'});if(!r.ok)throw Error('Could not read directory public key (HTTP '+r.status+').');const j=await r.json();if(!j.publicKey)throw Error('Directory did not return a public key.');safeSet('bp1p.key',j.publicKey);return j.publicKey}
 async function verifySigned(obj,key){if(!crypto.subtle)throw Error('This browser does not provide WebCrypto on local files.');const k=await crypto.subtle.importKey('spki',bytesB64(key),{name:'Ed25519'},false,['verify']);const data=new TextEncoder().encode(JSON.stringify(obj.manifest));return crypto.subtle.verify({name:'Ed25519'},k,bytesB64(obj.signature),data)}
-async function load(){const cfg=settings();$('#dot').className='dot';$('#status').textContent='Verifying '+cfg.directory+'â€¦';$('#apps').innerHTML='';try{if(!/^https?:\/\//i.test(cfg.directory))throw Error('Directory URL must start with http:// or https://');trustedKey=await resolveKey(cfg.directory,cfg.key);const r=await fetch(cfg.directory+'/api/manifest',{cache:'no-store',mode:'cors'});if(!r.ok)throw Error('Directory returned HTTP '+r.status);const obj=await r.json();if(!(await verifySigned(obj,trustedKey)))throw Error('Directory signature verification failed.');if(new Date(obj.manifest.expiresAt)<new Date())throw Error('Signed directory manifest has expired.');manifest=obj.manifest;render();$('#dot').className='dot ok';$('#status').textContent=`Verified network Â· ${manifest.nodes.length} node${manifest.nodes.length===1?'':'s'}`;}catch(e){manifest=null;$('#dot').className='dot bad';$('#status').textContent=e.message||String(e);$('#apps').innerHTML='<div class="empty">BP1P could not establish a trusted network connection. Make sure the host is running, then click Reload. You can also check Settings.</div>';}}
+async function load(){const cfg=settings();$('#dot').className='dot';$('#status').textContent='Verifying '+cfg.directory+'…';$('#apps').innerHTML='';try{if(!/^https?:\/\//i.test(cfg.directory))throw Error('Directory URL must start with http:// or https://');trustedKey=await resolveKey(cfg.directory,cfg.key);const r=await fetch(cfg.directory+'/api/manifest',{cache:'no-store',mode:'cors'});if(!r.ok)throw Error('Directory returned HTTP '+r.status);const obj=await r.json();if(!(await verifySigned(obj,trustedKey)))throw Error('Directory signature verification failed.');if(new Date(obj.manifest.expiresAt)<new Date())throw Error('Signed directory manifest has expired.');manifest=obj.manifest;render();$('#dot').className='dot ok';$('#status').textContent=`Verified network · ${manifest.nodes.length} node${manifest.nodes.length===1?'':'s'}`;}catch(e){manifest=null;$('#dot').className='dot bad';$('#status').textContent=e.message||String(e);$('#apps').innerHTML='<div class="empty">BP1P could not establish a trusted network connection. Make sure the host is running, then click Reload. You can also check Settings.</div>';}}
 function appMap(){const byApp=new Map();if(!manifest)return byApp;for(const n of manifest.nodes||[]){for(const a of n.apps||[]){if(!byApp.has(a.id))byApp.set(a.id,{app:a,nodes:[]});byApp.get(a.id).nodes.push(n)}}return byApp}
-function render(){const items=[...appMap().values()].sort((a,b)=>String(a.app.name).localeCompare(String(b.app.name)));$('#apps').innerHTML=items.length?items.map(({app,nodes})=>`<article class="app" data-app="${esc(app.id)}"><h3>${esc(app.name)}</h3><p>${esc(app.description||'Proxy application')}</p><div class="foot"><span class="node">${nodes.length} available node${nodes.length===1?'':'s'}</span><span class="open">Open â†’</span></div></article>`).join(''):'<div class="empty">No approved proxy applications are online.</div>';for(const el of document.querySelectorAll('.app'))el.addEventListener('click',()=>openApp(el.dataset.app))}
-function openApp(id){const options=(manifest?.nodes||[]).filter(n=>(n.apps||[]).some(a=>a.id===id));if(!options.length)return;options.sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));const n=options[0];const sid=randomSession();const url=n.url.replace(/\/$/,'')+'/s/'+sid+'/p/'+encodeURIComponent(id)+'/';currentApp=id;currentUrl=url;$('#browserAddress').textContent='bp1p://'+id+' Â· '+n.name;$('#frame').src=url;$('#home').style.display='none';$('#browser').classList.add('active')}
+function render(){const items=[...appMap().values()].sort((a,b)=>String(a.app.name).localeCompare(String(b.app.name)));$('#apps').innerHTML=items.length?items.map(({app,nodes})=>`<article class="app" data-app="${esc(app.id)}"><h3>${esc(app.name)}</h3><p>${esc(app.description||'Proxy application')}</p><div class="foot"><span class="node">${nodes.length} available node${nodes.length===1?'':'s'}</span><span class="open">Open →</span></div></article>`).join(''):'<div class="empty">No approved proxy applications are online.</div>';for(const el of document.querySelectorAll('.app'))el.addEventListener('click',()=>openApp(el.dataset.app))}
+function openApp(id){const options=(manifest?.nodes||[]).filter(n=>(n.apps||[]).some(a=>a.id===id));if(!options.length)return;options.sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));const n=options[0];const sid=randomSession();const url=n.url.replace(/\/$/,'')+'/s/'+sid+'/p/'+encodeURIComponent(id)+'/';currentApp=id;currentUrl=url;$('#browserAddress').textContent='bp1p://'+id+' · '+n.name;$('#frame').src=url;$('#home').style.display='none';$('#browser').classList.add('active')}
 function closeBrowser(){const f=$('#frame');f.src='about:blank';currentApp=null;currentUrl='';$('#browser').classList.remove('active');$('#home').style.display='block'}
 function refreshBrowser(){if(!currentUrl)return;const f=$('#frame');f.src='about:blank';setTimeout(()=>{f.src=currentUrl},30)}
 function openExternal(){if(currentUrl)window.open(currentUrl,'_blank','noopener,noreferrer')}
@@ -78,4 +78,3 @@ load();setInterval(()=>{if(!currentApp)load()},60000);
 </script>
 </body>
 </html>
-
